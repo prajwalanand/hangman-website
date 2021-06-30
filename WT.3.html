@@ -1,0 +1,223 @@
+<html>
+
+<head>
+	<title>Hangman</title>
+	<link id="titleimg" rel="shortcut icon" type="image/x-icon" href="img/h5.png" />
+</head>
+
+<body onload="loc()">
+
+<p id="para"></p>
+
+<script type="text/javascript">
+
+var score=window.localStorage.getItem("score");
+var num=0;
+
+function start()
+{
+	window.setInterval("alp()",1000);
+}
+
+function alp()
+{
+	num++;
+	document.getElementById("a1").innerHTML=num;
+}
+
+var name="Phoenix";
+var ques=new Array("Special type of ice cream!","Food which is a hut.","Gujarati speciality.","The \"King\" of junk food.","Mumbai\'s local delicacy.");
+var ans=new Array("SUNDAE","PIZZAS","DHOKLA","BURGER","CHAATS");
+var j=1;
+var quescount=0;
+var check="";
+
+function loc()
+{
+	if(window.localStorage.getItem("highscore"))
+	{}
+	else
+		window.localStorage.setItem("highscore",0);
+	fun();
+}
+
+function fun()
+{
+	document.writeln("<p id=\"p1\" style=\"position:relative;right:-40em;top:4em;color:white;\">Name:\n"+name+"</p>");
+	document.writeln("<p id=\"p2\" style=\"color:white;\">"+ques[quescount]+"</p>");
+	document.writeln("<form id=\"f1\" name=\"formInput\" method=\"get\">");
+	for(var i=0;i<6;i++)
+		document.writeln("<input type=\"text\" id=\"space"+i+"\" size=\"1\" maxlength=\"1\">");
+	document.writeln("<p style=\"color:white;\">Your guess:</p> <input type=\"text\" maxlength=\"1\" id=\"inp\"><input type=\"button\" value=\"Guess!\" onclick=\"input()\">");
+	document.writeln("</form>");
+	document.body.style.background="url(img/spooky.jpg) no-repeat center center fixed";
+  	//document.body.style.background-size= "cover";
+	//document.body.style.background-repeat= "no-repeat";
+	var timg=document.createElement("link");
+	timg.setAttribute("rel","shortcut icon");
+	timg.setAttribute("type","image/x-icon");
+	timg.setAttribute("href","img/h5.png");
+	document.head.appendChild(timg);
+	var h1=document.createElement("h1");
+	var p1=document.getElementById("p1");
+	h1.innerHTML="Hangman";
+	h1.id="h1";
+	h1.style.color="white";
+	document.body.insertBefore(h1,p1);
+	var p2=document.createElement("p");
+	p2.id="p5";
+	p2.style.color="white";
+	p2.innerHTML="Time spent : <p style=\"color:white;\" id=\"a1\">"+num+"</p>";
+	p2.style.position="relative";
+	p2.style.right="-50em";
+	p2.style.top="-7em";
+	document.body.appendChild(p2);
+	if(num==0)
+		start();
+	var p3=document.createElement("p");
+	p3.id="p6";
+	p3.style.position="relative";
+	p3.style.right="-60em";
+	p3.style.top="-11.25em";
+	p3.style.color="white";
+	p3.innerHTML="Score: <p style=\"color:white;\" id=\"a2\">"+score+"</p>";
+	document.body.appendChild(p3);
+	var p4=document.createElement("p");
+	p4.id="p7";
+	p4.style.color="white";
+	p4.innerHTML="High score: <p style=\"color:white;\" id=\"a3\">"+window.localStorage.getItem("highscore")+"</p>";
+	p4.style.position="relative";
+	p4.style.right="-70em";
+	p4.style.top="-15.75em";
+	document.body.appendChild(p4);
+	document.writeln("<img style=\"position:relative;right:-35em;top:-10em;\" id=\"pic0\" src=\"img/0.png\" width=\"250\" height=\"250\" alt=\"fail\">\n");
+}
+
+function input()
+{
+	var flag=false;
+	var guess=document.getElementById("inp").value;
+	guess=guess.toUpperCase();
+	document.getElementById("inp").value="";
+	for(var i=0;i<ans[quescount].length;i++)
+	{
+		if(ans[quescount].charAt(i)==guess.charAt(0))
+		{
+			var textid="space"+i;
+			document.getElementById(textid).value=ans[quescount].charAt(i);
+			flag=true;
+			score = parseInt(score)+parseInt(10);
+			var s=document.getElementById("a2");
+			s.innerHTML=score;
+			if(guessed())
+			{
+				score = parseInt(score)+parseInt(50);
+				s.innerHTML=score;
+				var x=document.getElementById("pic"+(j-1));
+				x.setAttribute("src", "img/"+ans[quescount].toLowerCase()+".jpg");
+				if(quescount==4)
+					window.setTimeout("g()",3000);
+				window.setTimeout("refresh()",3000);
+			}
+		}
+	}
+	if(flag!=true)
+	{
+		if(j==1)
+		{
+			var x = document.getElementById("pic0");
+			x.setAttribute("src","img/1.png");
+			x.setAttribute("id","pic1");
+			document.writeln("<p style=\"top:-30em;color:white;\" id=\"p3\">Guessed Letters:</p>\n<p style=\"top:-30em;color:white;\" id=\"p4\"></p>");
+			j++;
+		}
+		else
+		{
+			if(check.indexOf(guess.charAt(0))<0)
+			{
+				var a=document.getElementById("pic"+(j-1));
+				a.setAttribute("src",("img/"+j+".png"));
+				a.setAttribute("id",("pic"+j));
+				j++;
+			}
+		}
+		if(check.indexOf(guess.charAt(0))<0)
+		{
+			var write = document.getElementById("p4");
+			write.innerHTML=write.innerHTML+(guess.charAt(0));
+			score=parseInt(score)-parseInt(5);
+			var s=document.getElementById("a2");
+			s.innerHTML=score;
+		}
+		if(j>8)
+		{
+			window.alert("Game Over...:(");
+			if(parseInt(score)>parseInt(window.localStorage.getItem("highscore")))
+				window.localStorage.setItem("highscore",score);
+			window.setTimeout("end()",1000);
+		}
+		check=check+guess.substring(0,1);
+	}
+}
+
+function guessed()
+{
+	var a0=(document.getElementById("space0").value!="");
+	var a1=(document.getElementById("space1").value!="");
+	var a2=(document.getElementById("space2").value!="");
+	var a3=(document.getElementById("space3").value!="");
+	var a4=(document.getElementById("space4").value!="");
+	var a5=(document.getElementById("space5").value!="");
+	return a0&&a1&&a2&&a3&&a4&&a5;
+}
+
+function refresh()
+{
+	window.alert("Congratulations!");
+	check="";
+	quescount++;
+	var h1 = document.getElementById("h1");
+	document.body.removeChild(h1);
+	var p1 = document.getElementById("p1");
+	document.body.removeChild(p1);
+	var p2 = document.getElementById("p2");
+	document.body.removeChild(p2);
+	var p3 = document.getElementById("p3");
+	if(p3)
+		document.body.removeChild(p3);
+	var p4 = document.getElementById("p4");
+	if(p4)
+		document.body.removeChild(p4);
+	var p5 = document.getElementById("p5");
+	document.body.removeChild(p5);
+	var p6 = document.getElementById("p6");
+	document.body.removeChild(p6);
+	var p7 = document.getElementById("p7");
+	document.body.removeChild(p7);
+	var f1 = document.getElementById("f1");
+	document.body.removeChild(f1);
+	var im1 = document.getElementById("pic"+(j-1));
+	document.body.removeChild(im1);
+	j=1;
+	score = parseInt(score) + parseInt(parseInt(50)-parseInt(num));
+	num=0;
+	window.setTimeout("fun()",1000);
+}
+
+function end()
+{
+	window.location.href="pic.html";
+}
+
+function g()
+{
+	if(parseInt(score)>parseInt(window.localStorage.getItem("highscore")))
+		window.localStorage.setItem("highscore",score);
+	window.location.href="pic.html";
+}
+
+</script>
+
+</body>
+
+</html>
